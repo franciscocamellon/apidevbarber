@@ -80,7 +80,7 @@ class CreateAllTables extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('userfavorities');
         Schema::dropIfExists('userappointments');
-        Schema::dropIfExists('barber');
+        Schema::dropIfExists('barbers');
         Schema::dropIfExists('barberphotos');
         Schema::dropIfExists('barberreviews');
         Schema::dropIfExists('barberservices');

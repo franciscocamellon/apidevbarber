@@ -11,7 +11,7 @@ use App\Models\User;
 class AuthController extends Controller
 {
     public function __construct() {
-        $this->middleware('auth:api', ['except' => ['create', 'login']]);
+        $this->middleware('auth:api', ['except' => ['create', 'login', 'unauthorized']]);
     }
 
     public function create(Request $request) {
@@ -48,6 +48,7 @@ class AuthController extends Controller
                     return $array;
                 }
                 $info = auth()->user();
+                $info['avatar'] = url('media/avatars/'.$info['avatar']);
                 $array['data'] = $info;
                 $array['token'] = $token;
 
@@ -63,5 +64,52 @@ class AuthController extends Controller
 
         return $array;
 
+    }
+    public function login(Request $request) {
+        $array = ['error'=>''];
+
+        $email = $request->input('email');
+        $password = $request->input('password');
+
+        $token = auth()->attempt([
+            'email' => $email,
+            'password' => $password
+        ]);
+
+        if(!$token) {
+            $array['error'] = 'Usuário e/ou senha errados!';
+            return $array;
+        }
+
+        $info = auth()->user();
+        $info['avatar'] = url('media/avatars/'.$info['avatar']);
+        $array['data'] = $info;
+        $array['token'] = $token;
+
+        return $array;
+    }
+
+    public function logout() {
+        auth()->logout();
+        return ['error'=>''];
+    }
+
+    public function refresh() {
+        $array = ['error'=>''];
+
+        $token = auth()->refresh();
+
+        $info = auth()->user();
+        $info['avatar'] = url('media/avatars/'.$info['avatar']);
+        $array['data'] = $info;
+        $array['token'] = $token;
+
+        return $array;
+    }
+
+    public function unauthorized() {
+        return response()->json([
+            'error' => 'Não autorizado'
+        ], 401);
     }
 }
